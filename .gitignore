@@ -1,0 +1,23 @@
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Node.js dependencies and build output
+**/node_modules/
+**/.next/
+**/dist/
+**/coverage/
+
+# Prisma local DB artifacts
+**/*.db
+**/*.db-journal
+
+# IDE files
+.vscode/
+.idea/
