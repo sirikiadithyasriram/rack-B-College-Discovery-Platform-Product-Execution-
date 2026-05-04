@@ -24,14 +24,19 @@ router.get("/", async (req, res) => {
     where.rank = { lte: Number(maxRank) };
   }
 
-  const colleges = await prisma.college.findMany({
-    where,
-    skip: (Number(page) - 1) * 10,
-    take: 10,
-    orderBy: { rating: "desc" }
-  });
+  try {
+    const colleges = await prisma.college.findMany({
+      where,
+      skip: (Number(page) - 1) * 10,
+      take: 10,
+      orderBy: { rating: "desc" }
+    });
 
-  return res.json(colleges);
+    return res.json(colleges);
+  } catch (error) {
+    console.error("[colleges] GET / failed:", error);
+    return res.status(500).json({ error: "Unable to load colleges" });
+  }
 });
 
 router.get("/:id", async (req, res) => {
@@ -40,12 +45,17 @@ router.get("/:id", async (req, res) => {
     return res.status(400).json({ error: "Invalid college id" });
   }
 
-  const college = await prisma.college.findUnique({ where: { id } });
-  if (!college) {
-    return res.status(404).json({ error: "College not found" });
-  }
+  try {
+    const college = await prisma.college.findUnique({ where: { id } });
+    if (!college) {
+      return res.status(404).json({ error: "College not found" });
+    }
 
-  return res.json(college);
+    return res.json(college);
+  } catch (error) {
+    console.error(`[colleges] GET /${id} failed:`, error);
+    return res.status(500).json({ error: "Unable to load college" });
+  }
 });
 
 router.post("/compare", async (req, res) => {
@@ -54,11 +64,16 @@ router.post("/compare", async (req, res) => {
     return res.status(400).json({ error: "Provide 2 to 3 college ids to compare" });
   }
 
-  const colleges = await prisma.college.findMany({
-    where: { id: { in: ids.map(Number) } }
-  });
+  try {
+    const colleges = await prisma.college.findMany({
+      where: { id: { in: ids.map(Number) } }
+    });
 
-  return res.json(colleges);
+    return res.json(colleges);
+  } catch (error) {
+    console.error("[colleges] POST /compare failed:", error);
+    return res.status(500).json({ error: "Unable to compare colleges" });
+  }
 });
 
 export default router;
